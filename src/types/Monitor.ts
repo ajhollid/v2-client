@@ -1,0 +1,20 @@
+import type { Check } from "./Check";
+
+export interface IMonitor {
+  checks: Check[];
+  createdAt: string;
+  createdBy: string;
+  interval: number;
+  isActive: boolean;
+  lastStatuses: string[];
+  n: number;
+  m: number;
+  name: string;
+  status: string;
+  type: string;
+  updatedAt: string;
+  updatedBy: string;
+  url: string;
+  __v: number;
+  _id: string;
+}
