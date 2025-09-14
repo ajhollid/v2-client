@@ -3,6 +3,7 @@ import { VStack, HStack, Spinner, Box } from "@chakra-ui/react";
 import { StandardText } from "@/components/ui/standardText";
 import { ResponseTimeChart } from "@/components/ui/ResponseTimeChart";
 import { useGet } from "@/hooks/UseApi";
+import { AvgResponseTimeChart } from "@/components/ui/AvgResponseTimeChart";
 
 export const UptimePage = () => {
   const { id } = useParams();
@@ -84,6 +85,28 @@ export const UptimePage = () => {
             } ms`}</StandardText>
           </VStack>
         </Box>
+      </HStack>
+      <HStack width={"100%"}>
+        <Box
+          flex={1}
+          border={"1px solid"}
+          borderColor={"gray.contrast"}
+          p={2}
+          mt={2}
+          width="100%"
+        />
+        <Box
+          flex={1}
+          border={"1px solid"}
+          borderColor={"gray.contrast"}
+          p={2}
+          mt={2}
+          width="100%"
+        />
+        <AvgResponseTimeChart
+          avg={stats?.avgResponseTime}
+          max={stats?.maxResponseTime}
+        />
       </HStack>
       <ResponseTimeChart checks={response?.data.checks} />
     </VStack>
