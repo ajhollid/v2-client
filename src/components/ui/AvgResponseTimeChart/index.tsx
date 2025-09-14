@@ -1,4 +1,4 @@
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Label } from "recharts";
 import { Box, useToken } from "@chakra-ui/react";
 import { StandardText } from "@/components/ui/standardText";
 export const AvgResponseTimeChart = ({
@@ -29,7 +29,7 @@ export const AvgResponseTimeChart = ({
       width="100%"
     >
       <Box pt={2} pb={2} mb={2}>
-        <StandardText fontSize="2xl">Response Time</StandardText>
+        <StandardText fontSize="2xl">Average response time</StandardText>
       </Box>
       <Box width="100%" height="600px" position="absolute" bottom={0}>
         <ResponsiveContainer width={"100%"} height={"100%"}>
@@ -45,11 +45,22 @@ export const AvgResponseTimeChart = ({
               cy={"100%"}
             >
               {chartData.map((entry) => (
-                <Cell key={`cell-${entry.name}`} fill={entry.color} />
+                <Cell key={`cell-${entry.name}`} fill={entry.color}></Cell>
               ))}
             </Pie>
           </PieChart>
         </ResponsiveContainer>
+        <Box
+          position={"absolute"}
+          top={"100%"}
+          left={"50%"}
+          transform={"translate(-50%, -200%)"}
+          textAlign="center"
+        >
+          <StandardText fontSize="md">
+            {avg ? `${avg.toFixed(0)} ms` : "No data"}
+          </StandardText>
+        </Box>
       </Box>
     </Box>
   );
