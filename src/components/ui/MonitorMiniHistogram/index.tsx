@@ -62,6 +62,7 @@ export const MonitorMiniHistogram = ({
                 >
                   <Flex
                     height={`${(check?.avgResponseTime / max) * 100}%`}
+                    maxWidth={"10px"}
                     width={(1 / checks?.length) * 100 + "%"}
                     bg={"gray.contrast"}
                     gap={2}

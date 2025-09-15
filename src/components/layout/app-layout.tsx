@@ -17,13 +17,13 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
     await postData(null);
   };
 
-  if (loading) {
-    return (
-      <Flex minH="100vh" align="center" justify="center">
-        <Spinner size="xl" color="gray.contrast" />
-      </Flex>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <Flex minH="100vh" align="center" justify="center">
+  //       <Spinner size="xl" color="gray.contrast" />
+  //     </Flex>
+  //   );
+  // }
 
   if (error) {
     console.error(error);
@@ -57,7 +57,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
         </Flex>
       </Box>
       {/* Main Content */}
-      <Box flex="1" p={8} bg={"gray.100"}>
+      <Box flex="1" pt={4} pb={4} pl={20} pr={20} bg={"gray.100"}>
         {children}
       </Box>
     </Flex>
