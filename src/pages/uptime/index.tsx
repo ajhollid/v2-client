@@ -4,6 +4,7 @@ import { StandardText } from "@/components/ui/standardText";
 import { ResponseTimeChart } from "@/components/ui/ResponseTimeChart";
 import { useGet } from "@/hooks/UseApi";
 import { AvgResponseTimeChart } from "@/components/ui/AvgResponseTimeChart";
+import { MonitorMiniHistogram } from "@/components/ui/MonitorMiniHistogram";
 
 export const UptimePage = () => {
   const { id } = useParams();
@@ -11,6 +12,17 @@ export const UptimePage = () => {
   const { response, error, loading } = useGet<any>(
     `/monitors/${id}?embedChecks=true&range=30m`
   );
+  const {
+    response: upResponse,
+    error: upError,
+    loading: upLoading,
+  } = useGet<any>(`/monitors/${id}?embedChecks=true&range=30m&status=up`);
+
+  const {
+    response: downResponse,
+    error: downError,
+    loading: downLoading,
+  } = useGet<any>(`/monitors/${id}?embedChecks=true&range=30m&status=down`);
 
   if (!id) {
     return <Navigate to="/uptimes" replace={true} />;
@@ -86,22 +98,18 @@ export const UptimePage = () => {
           </VStack>
         </Box>
       </HStack>
-      <HStack width={"100%"}>
-        <Box
-          flex={1}
-          border={"1px solid"}
-          borderColor={"gray.contrast"}
-          p={2}
-          mt={2}
-          width="100%"
+      <HStack width={"100%"} height={"300px"}>
+        <MonitorMiniHistogram
+          loading={upLoading}
+          checks={upResponse?.data?.checks || []}
+          status="up"
+          max={stats?.maxResponseTime}
         />
-        <Box
-          flex={1}
-          border={"1px solid"}
-          borderColor={"gray.contrast"}
-          p={2}
-          mt={2}
-          width="100%"
+        <MonitorMiniHistogram
+          loading={downLoading}
+          checks={downResponse?.data?.checks || []}
+          status="down"
+          max={stats?.maxResponseTime}
         />
         <AvgResponseTimeChart
           avg={stats?.avgResponseTime}
