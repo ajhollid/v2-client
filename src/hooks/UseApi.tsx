@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AxiosError } from "axios";
 import api, { get, post } from "@/utils/ApiClient";
 
 interface ApiState<T> {
@@ -77,15 +78,17 @@ export const usePost = <ResponseType, ResponseBodyType = unknown>(
       }
       return response.data;
     } catch (err) {
+      const msg =
+        (err as AxiosError)?.response?.data?.error?.message ||
+        (err as Error).message;
       setState({
         data: null,
         loading: false,
-        error: (err as Error).message,
+        error: msg,
       });
       if (onFail) {
         onFail();
       }
-      throw err;
     }
   };
 

@@ -6,21 +6,27 @@ import { useAuth } from "@/hooks/AuthHooks";
 import { usePost } from "@/hooks/UseApi";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-type LoginData = {
-  username: string;
-  password: string;
-};
 
-const formSchema = z.object({
-  email: z.email({ message: "Invalid email address" }),
-  password: z
-    .string()
-    .min(6, { message: "Password must be at least 6 characters" }),
-});
+const formSchema = z
+  .object({
+    email: z.email({ message: "Invalid email address" }),
+    firstName: z.string().min(1, { message: "First Name is required" }),
+    lastName: z.string().min(1, { message: "Last Name is required" }),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" }),
+    confirmPassword: z
+      .string()
+      .min(6, { message: "Confirm Password must be at least 6 characters" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords must match",
+  });
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const LoginPage = () => {
+export const RegisterPage = () => {
   // Hooks
   const { setAuthenticated } = useAuth();
 
@@ -29,8 +35,8 @@ export const LoginPage = () => {
     postData,
     loading: isLoading,
     error,
-  } = usePost<LoginData, { email: string; password: string }>(
-    "/auth/login",
+  } = usePost<FormValues>(
+    "/auth/register",
     {},
     () => {
       setAuthenticated(true);
@@ -44,8 +50,12 @@ export const LoginPage = () => {
   // Local state for form fields
 
   const onSubmit = async (data: FormValues) => {
-    console.log({ data });
-    await postData({ email: data.email, password: data.password });
+    await postData({
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+    });
   };
 
   const {
@@ -72,10 +82,25 @@ export const LoginPage = () => {
             <Input {...register("email")} />
             <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
           </Field.Root>
+          <Field.Root invalid={!!errors.firstName}>
+            <Field.Label>First Name</Field.Label>
+            <Input {...register("firstName")} />
+            <Field.ErrorText>{errors.firstName?.message}</Field.ErrorText>
+          </Field.Root>
+          <Field.Root invalid={!!errors.lastName}>
+            <Field.Label>Last Name</Field.Label>
+            <Input {...register("lastName")} />
+            <Field.ErrorText>{errors.lastName?.message}</Field.ErrorText>
+          </Field.Root>
           <Field.Root invalid={!!errors.password}>
             <Field.Label>Password</Field.Label>
             <PasswordInput {...register("password")} />
             <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+          </Field.Root>
+          <Field.Root invalid={!!errors.confirmPassword}>
+            <Field.Label>Confirm Password</Field.Label>
+            <PasswordInput {...register("confirmPassword")} />
+            <Field.ErrorText>{errors.confirmPassword?.message}</Field.ErrorText>
           </Field.Root>
           <Button
             loading={isLoading}
@@ -83,7 +108,7 @@ export const LoginPage = () => {
             colorPalette={"gray"}
             variant="subtle"
           >
-            Login
+            Register
           </Button>
           {error && <div style={{ color: "red" }}>{error}</div>}
         </Flex>
