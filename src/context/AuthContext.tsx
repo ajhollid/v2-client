@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from "react";
 
 type AuthContextType = {
-  isAuthenticated: boolean;
+  isAuthenticated: boolean | null;
   setAuthenticated: (auth: boolean) => void;
   loading: boolean;
 };

@@ -4,17 +4,13 @@ import { usePost } from "@/hooks/UseApi";
 import { useAuth } from "@/hooks/AuthHooks";
 
 export const AppLayout = ({ children }: { children: React.ReactNode }) => {
-  const { setAuthenticated, loading } = useAuth();
-  const {
-    postData,
-    loading: isLoading,
-    error,
-  } = usePost<null>("/auth/logout", {}, () => {
-    setAuthenticated(false);
-  });
+  const { setAuthenticated } = useAuth();
+
+  const { post, error, loading: apiLoading } = usePost("/auth/logout");
 
   const handleLogout = async () => {
-    await postData(null);
+    await post({});
+    setAuthenticated(false);
   };
 
   // if (loading) {
@@ -47,7 +43,7 @@ export const AppLayout = ({ children }: { children: React.ReactNode }) => {
           </Button>
           <div style={{ flex: 1 }}></div>
           <Button
-            loading={isLoading}
+            loading={apiLoading}
             onClick={handleLogout}
             colorPalette={"gray"}
             variant={"subtle"}

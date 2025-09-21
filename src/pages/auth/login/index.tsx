@@ -24,28 +24,21 @@ export const LoginPage = () => {
   // Hooks
   const { setAuthenticated } = useAuth();
 
-  // Post to login
-  const {
-    postData,
-    loading: isLoading,
-    error,
-  } = usePost<LoginData, { email: string; password: string }>(
-    "/auth/login",
-    {},
-    () => {
-      setAuthenticated(true);
-      navigate("/");
-    },
-    () => {
-      setAuthenticated(false);
-    }
+  const { post, loading, error } = usePost<FormValues, LoginData>(
+    "/auth/login"
   );
   const navigate = useNavigate();
   // Local state for form fields
 
   const onSubmit = async (data: FormValues) => {
-    console.log({ data });
-    await postData({ email: data.email, password: data.password });
+    const response = await post(data);
+    if (response) {
+      setAuthenticated(true);
+      navigate("/");
+    } else {
+      setAuthenticated(false);
+      console.error(error);
+    }
   };
 
   const {
@@ -78,7 +71,7 @@ export const LoginPage = () => {
             <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
           </Field.Root>
           <Button
-            loading={isLoading}
+            loading={loading}
             type="submit"
             colorPalette={"gray"}
             variant="subtle"

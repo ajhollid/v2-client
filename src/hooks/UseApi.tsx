@@ -1,96 +1,55 @@
-import { useEffect, useState } from "react";
-import { AxiosError } from "axios";
-import api, { get, post } from "@/utils/ApiClient";
+import { useState } from "react";
+import useSWR from "swr";
+import type { SWRConfiguration } from "swr";
+import type { AxiosRequestConfig } from "axios";
+import { get, post } from "@/utils/ApiClient"; // your axios wrapper
 
-interface ApiState<T> {
-  response: T | null;
-  loading: boolean;
-  error: string | null;
-}
-
-export const useGet = <ResponseType,>(
-  url: string,
-  config: Record<string, any> = {},
-  onSuccess?: (data: ResponseType) => void,
-  onFail?: () => void
-) => {
-  const [state, setState] = useState<ApiState<ResponseType>>({
-    response: null,
-    loading: true,
-    error: null,
-  });
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchData = async () => {
-      try {
-        setState((prev) => ({ ...prev, loading: true }));
-        const response = await get(url, config);
-        if (isMounted) {
-          setState({ response: response.data, loading: false, error: null });
-          if (onSuccess) {
-            onSuccess(response.data);
-          }
-        }
-      } catch (error) {
-        if (isMounted) {
-          setState({
-            response: null,
-            loading: false,
-            error: (error as Error).message,
-          });
-          if (onFail) {
-            onFail();
-          }
-        }
-      }
-    };
-    fetchData();
-
-    return () => {
-      isMounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, JSON.stringify(config)]);
-  return state;
+// Generic fetcher for GET requests
+const fetcher = async <T,>(url: string, config?: AxiosRequestConfig) => {
+  const res = await get<T>(url, config);
+  return res.data;
 };
 
-export const usePost = <ResponseType, ResponseBodyType = unknown>(
+export const useGet = <T,>(
   url: string,
-  config: Record<string, any> = {},
-  onSuccess?: (data: ResponseType) => void,
-  onFail?: () => void
+  axiosConfig?: AxiosRequestConfig,
+  swrConfig?: SWRConfiguration<T, Error>
 ) => {
-  const [state, setState] = useState<ApiState<ResponseType>>({
-    data: null,
-    loading: false,
-    error: null,
-  });
+  const { data, error, isLoading, mutate } = useSWR<T>(
+    url,
+    (url) => fetcher<T>(url, axiosConfig),
+    swrConfig
+  );
 
-  const postData = async (body: ResponseBodyType) => {
+  return {
+    response: data ?? null,
+    loading: isLoading,
+    error: error?.message ?? null,
+    refetch: mutate,
+  };
+};
+
+export const usePost = <B = any, R = any>(endpoint: string) => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const postFn = async (
+    body: B,
+    config?: AxiosRequestConfig
+  ): Promise<R | null> => {
+    setLoading(true);
+    setError(null);
+
     try {
-      setState((prev) => ({ ...prev, loading: true }));
-      const response = await post(url, body, config);
-      setState({ data: response.data, loading: false, error: null });
-      if (onSuccess) {
-        onSuccess(response.data);
-      }
-      return response.data;
-    } catch (err) {
-      const msg =
-        (err as AxiosError)?.response?.data?.error?.message ||
-        (err as Error).message;
-      setState({
-        data: null,
-        loading: false,
-        error: msg,
-      });
-      if (onFail) {
-        onFail();
-      }
+      const res = await post<R>(endpoint, body, config);
+      return res.data;
+    } catch (err: any) {
+      setError(err?.message ?? "Unknown error");
+      return null;
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { ...state, postData };
+  return { post: postFn, loading, error };
 };

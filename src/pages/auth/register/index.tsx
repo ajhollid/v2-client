@@ -4,6 +4,7 @@ import { Flex, Field, Input, Button } from "@chakra-ui/react";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useAuth } from "@/hooks/AuthHooks";
 import { usePost } from "@/hooks/UseApi";
+
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
@@ -31,31 +32,19 @@ export const RegisterPage = () => {
   const { setAuthenticated } = useAuth();
 
   // Post to login
-  const {
-    postData,
-    loading: isLoading,
-    error,
-  } = usePost<FormValues>(
-    "/auth/register",
-    {},
-    () => {
-      setAuthenticated(true);
-      navigate("/");
-    },
-    () => {
-      setAuthenticated(false);
-    }
-  );
+  const { post, loading, error } = usePost<FormValues, any>("/auth/register");
+
   const navigate = useNavigate();
   // Local state for form fields
 
   const onSubmit = async (data: FormValues) => {
-    await postData({
-      email: data.email,
-      password: data.password,
-      firstName: data.firstName,
-      lastName: data.lastName,
-    });
+    const response = await post(data);
+    if (response) {
+      setAuthenticated(true);
+      navigate("/");
+    } else {
+      setAuthenticated(false);
+    }
   };
 
   const {
@@ -103,7 +92,7 @@ export const RegisterPage = () => {
             <Field.ErrorText>{errors.confirmPassword?.message}</Field.ErrorText>
           </Field.Root>
           <Button
-            loading={isLoading}
+            loading={loading}
             type="submit"
             colorPalette={"gray"}
             variant="subtle"

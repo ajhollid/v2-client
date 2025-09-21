@@ -4,6 +4,7 @@ import { LoginPage } from "@/pages/auth/login";
 import { RegisterPage } from "@/pages/auth/register";
 import { UptimesPage } from "@/pages/uptimes";
 import { UptimePage } from "@/pages/uptime";
+import { CreateUptimePage } from "@/pages/uptimes/create";
 import ProtectedRoute from "@/components/util/ProtectedRoute.tsx";
 function App() {
   return (
@@ -22,6 +23,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <UptimesPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/uptimes/create"
+                element={
+                  <ProtectedRoute>
+                    <CreateUptimePage />
                   </ProtectedRoute>
                 }
               />

@@ -4,6 +4,7 @@ import type { IMonitor } from "@/types/Monitor";
 import { useNavigate } from "react-router-dom";
 import { Grid, GridItem, Stack, Spinner, Text } from "@chakra-ui/react";
 import { MonitorHistogram } from "@/components/ui/MonitorHistogram";
+import { MonitorsControls } from "@/components/ui/MonitorsControls";
 export const UptimesPage = () => {
   const { response, error, loading } = useGet<ApiResponse>(
     "/monitors?embedChecks=true"
@@ -20,6 +21,7 @@ export const UptimesPage = () => {
 
   return (
     <Stack>
+      <MonitorsControls type="uptime" />
       {response?.data?.map((monitor: IMonitor) => {
         return (
           <Grid

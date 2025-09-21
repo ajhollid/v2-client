@@ -4,17 +4,18 @@ import { useState, useEffect } from "react";
 import { useGet } from "@/hooks/UseApi";
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setAuthenticated] = useState(false);
-  const { data, error, loading } = useGet(
-    "/auth/me",
-    {},
-    () => {
-      setAuthenticated(true);
-    },
-    () => {
-      setAuthenticated(false);
+  const [isAuthenticated, setAuthenticated] = useState<boolean | null>(null);
+
+  const { response: me, loading, error } = useGet("/auth/me");
+  useEffect(() => {
+    if (!loading) {
+      if (me) {
+        setAuthenticated(true);
+      } else {
+        setAuthenticated(false);
+      }
     }
-  );
+  }, [me, loading, error]);
 
   return (
     <AuthContext.Provider
