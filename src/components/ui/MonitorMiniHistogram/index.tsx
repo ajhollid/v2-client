@@ -46,6 +46,28 @@ export const MonitorMiniHistogram = ({
             .slice()
             .reverse()
             .map((check) => {
+              const safeValue = Math.max(check.avgResponseTime, 1);
+              const logValue = Math.log10(safeValue);
+              const logMin = Math.log10(
+                Math.max(
+                  Math.min(
+                    ...checks.map((c) => Math.max(c.avgResponseTime, 1))
+                  ),
+                  1
+                )
+              );
+              const logMax = Math.log10(
+                Math.max(...checks.map((c) => Math.max(c.avgResponseTime, 1)))
+              );
+
+              const heightPct =
+                logMax === logMin
+                  ? 100
+                  : Math.max(
+                      ((logValue - logMin) / (logMax - logMin)) * 100,
+                      5
+                    );
+
               return (
                 <Tooltip
                   content={
@@ -61,7 +83,7 @@ export const MonitorMiniHistogram = ({
                   closeDelay={10}
                 >
                   <Flex
-                    height={`${(check?.avgResponseTime / max) * 100}%`}
+                    height={`${heightPct}%`}
                     maxWidth={"10px"}
                     width={(1 / checks?.length) * 100 + "%"}
                     bg={"gray.contrast"}

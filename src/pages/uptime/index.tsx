@@ -14,6 +14,24 @@ import { useGet } from "@/hooks/UseApi";
 import { AvgResponseTimeChart } from "@/components/ui/AvgResponseTimeChart";
 import { MonitorMiniHistogram } from "@/components/ui/MonitorMiniHistogram";
 
+interface IMonitorStats {
+  monitorId: string;
+  avgResponseTime: number;
+  maxResponseTime: number;
+  totalChecks: number;
+  totalUpChecks: number;
+  totalDownChecks: number;
+  uptimePercentage: number;
+  lastCheckTimestamp: number;
+  lastResponseTime: number;
+  timeOfLastFailure: number;
+  currentStreak: number;
+  currentStreakStatus: string;
+  currentStreakStartedAt: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export const UptimePage = () => {
   const { id } = useParams();
   const [range, setRange] = useState("30m");
@@ -40,17 +58,18 @@ export const UptimePage = () => {
   }
 
   const monitor = response?.data?.monitor;
-  const stats = response?.data?.stats;
+  const stats: IMonitorStats = response?.data?.stats;
 
   const lastChecked = (
     (Date.now() - (stats?.lastCheckTimestamp ?? 0)) /
     1000
   ).toFixed(0);
 
-  const activeFor =
-    stats?.timeOfLastFailure !== 0
-      ? (Date.now() - stats?.timeOfLastFailure) / 1000
-      : 0;
+  const streakDuration = stats?.currentStreakStartedAt
+    ? (Date.now() - stats?.currentStreakStartedAt) / 1000
+    : 0;
+
+  const streakStatus = stats?.currentStreakStatus || "unknown";
 
   return (
     <VStack gap={0} align={"start"}>
@@ -70,8 +89,8 @@ export const UptimePage = () => {
           mt={2}
         >
           <VStack gap={0} align={"start"}>
-            <StandardText fontSize="m">{`Active for `}</StandardText>
-            <StandardText fontSize="sm">{`${activeFor} seconds`}</StandardText>
+            <StandardText fontSize="m">{`${streakStatus} for `}</StandardText>
+            <StandardText fontSize="sm">{`${streakDuration} seconds`}</StandardText>
           </VStack>
         </Box>
         <Box

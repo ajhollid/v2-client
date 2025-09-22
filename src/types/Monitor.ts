@@ -6,9 +6,8 @@ export interface IMonitor {
   createdBy: string;
   interval: number;
   isActive: boolean;
-  lastStatuses: string[];
+  latestChecks: Check[];
   n: number;
-  m: number;
   name: string;
   status: string;
   type: string;

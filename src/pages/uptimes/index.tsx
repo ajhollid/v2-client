@@ -9,6 +9,7 @@ export const UptimesPage = () => {
   const { response, error, loading } = useGet<ApiResponse>(
     "/monitors?embedChecks=true"
   );
+
   const navigate = useNavigate();
 
   if (loading) {
@@ -38,8 +39,11 @@ export const UptimesPage = () => {
                 {monitor.name}
               </Text>
             </GridItem>
-            <GridItem>
-              <MonitorHistogram key={monitor._id} checks={monitor.checks} />
+            <GridItem pr={"5vw"}>
+              <MonitorHistogram
+                key={monitor._id}
+                checks={monitor.latestChecks}
+              />
             </GridItem>
           </Grid>
         );
